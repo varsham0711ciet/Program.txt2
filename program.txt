@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 100
+
+typedef struct {
+    char studentId[20];
+    char date[20];
+    char status[20];
+} Attendance;
+
+Attendance records[MAX];
+int count = 0;
+
+typedef struct Node {
+    char studentId[20];
+    char date[20];
+    char status[20];
+    struct Node* next;
+} Node;
+
+Node* head = NULL;
+
+void addRecord(char id[], char date[], char status[]) {
+    if (count < MAX) {
+        strcpy(records[count].studentId, id);
+        strcpy(records[count].date, date);
+        strcpy(records[count].status, status);
+        count++;
+    }
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    strcpy(newNode->studentId, id);
+    strcpy(newNode->date, date);
+    strcpy(newNode->status, status);
+    newNode->next = NULL;
+    if (head == NULL) head = newNode;
+    else {
+        Node* temp = head;
+        while (temp->next != NULL) temp = temp->next;
+        temp->next = newNode;
+    }
+}
+
+void deleteRecord(char id[], char date[]) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(records[i].studentId, id) == 0 && strcmp(records[i].date, date) == 0) {
+            for (int j = i; j < count - 1; j++) records[j] = records[j + 1];
+            count--;
+            break;
+        }
+    }
+    Node* temp = head;
+    Node* prev = NULL;
+    while (temp != NULL) {
+        if (strcmp(temp->studentId, id) == 0 && strcmp(temp->date, date) == 0) {
+            if (prev == NULL) head = temp->next;
+            else prev->next = temp->next;
+            free(temp);
+            break;
+        }
+        prev = temp;
+        temp = temp->next;
+    }
+}
+
+void searchRecord(char id[], char date[]) {
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(records[i].studentId, id) == 0 && strcmp(records[i].date, date) == 0) {
+            printf("%s %s %s\n", records[i].studentId, records[i].date, records[i].status);
+            found = 1;
+            break;
+        }
+    }
+    if (!found) printf("Not found\n");
+}
+
+void displayRecords(char date[]) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(records[i].date, date) == 0) {
+            printf("%s %s %s\n", records[i].studentId, records[i].date, records[i].status);
+        }
+    }
+}
+
+void reverseDisplayArray(char date[]) {
+    for (int i = count - 1; i >= 0; i--) {
+        if (strcmp(records[i].date, date) == 0) {
+            printf("%s %s %s\n", records[i].studentId, records[i].date, records[i].status);
+        }
+    }
+}
+
+int main() {
+    int choice;
+    char id[20], date[20], status[20];
+    while (1) {
+        printf("\n1. Add\n2. Delete\n3. Search\n4. Display\n5. Reverse Display\n6. Exit\n");
+        scanf("%d", &choice);
+        if (choice == 6) break;
+        if (choice == 1) {
+            scanf("%s %s %s", id, date, status);
+            addRecord(id, date, status);
+        } else if (choice == 2) {
+            scanf("%s %s", id, date);
+            deleteRecord(id, date);
+        } else if (choice == 3) {
+            scanf("%s %s", id, date);
+            searchRecord(id, date);
+        } else if (choice == 4) {
+            scanf("%s", date);
+            displayRecords(date);
+        } else if (choice == 5) {
+            scanf("%s", date);
+            reverseDisplayArray(date);
+        }
+    }
+    return 0;
+}
